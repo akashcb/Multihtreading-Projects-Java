@@ -1,0 +1,4 @@
+Notes on assignment two:
+
+There are two ways to acheive synchronization: 1 if I put every hashmap and arraylist in synchronized block
+2nd allocating synchronized to every other method

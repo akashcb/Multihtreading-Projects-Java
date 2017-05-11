@@ -1,0 +1,215 @@
+submitItem:
+
+Pre-conditions:
+a.	Lowest bidding price falls under range of 0-99
+b.	Seller item count should not be more than 3 with lowest bidding price of greater than 75 or check if seller falls under disqualified 
+c.	Current active items count should not be more than server capacity
+d.	Current sellers active number of items on sale should not be more than allowed maximum number of seller items count.
+
+Post-conditions:
+a.	Returns listing identification if successful 
+b.	Returns -1 on failure
+c.	Increment the count of seller active items on server
+d.	Add item into the list of current active items
+
+Invariants: Determine if item exists in current item list otherwise add it
+
+Pseudo-code:
+public synchronized int submitItem(String sellerName, String itemName, int lowestBiddingPrice, int biddingDurationMs)
+{
+	//if -> itemsAndId().size < serverCapacity
+		//Then
+		//if -> itemsPerSeller.get(sellerName) != null
+			//Then
+				//if -> itemsPerSeller.get(sellerName) < maxSellerItems && (lowestBiddingPrice >=0 && lowestBiddingPrice <=99)
+					//Then
+					//lastListigId -> lastListingId + 1
+					//Item i -> new Item(sellerName, itemName, lowestBiddingPrice, biddingDurationMs)
+					//itemsAndIds.put(lastListingId, i)
+					//itemsUpForBidding.add(i)
+					//currentItemCount <- itemsPerSeller.get(sellername)
+					//itemsPerSeller.put(sellerName, currentItemCount ++)
+			//Else
+				//itemsPerSeller.put(sellerName, 0)
+				//lastListigId -> lastListingId + 1
+				//Item i -> new Item(sellerName, itemName, lowestBiddingPrice, biddingDurationMs)
+				//itemsAndIds.put(lastListingId, i)
+				//itemsUpForBidding.add(i)
+				//currentItemCount <- itemsPerSeller.get(sellername)
+				//itemsPerSeller.put(sellerName, currentItemCount ++)
+	return lastListingId
+}
+
+getItems
+
+Pre-conditions:  No conditions
+
+Post-conditions: Returns current list of active listed items on server
+
+Invariants: Provides with the list of active listed items
+
+Pseudo-code:
+public ArrayList<Item> getItems()
+{
+	// creates and returns new ArrayList<Item>(itemsUpForBidding) with values from itemsUpForBidding	
+}
+
+itemPrice
+Pre-conditions:
+a.	Valid listing id used as input
+
+Post-conditions:
+a.	Returns -1 if listing is not available
+b.	Returns highest bidding price from highestBidders list keeping tab of current highest bidders amount
+c. 	Returns lowest bidding price from Item if listingId is not available in highestBidders list
+
+Invariants: Provides current highest bid price listed or lowest bidding price if highest unavailable
+
+Pseudo-code:
+public int itemPrice(int listingId)
+{
+	//Item i -> AuctionServer.getInstance().getItems().get(listingId)
+	//if -> i != null
+		//Then
+		//highestBid <- i.lowestBiddingPrice();
+		//if -> highestBids.contains(listingId)
+			//Then
+			//highestBid <- highestBids.get(listingId)
+
+}
+
+
+
+submitBid()
+
+invariant:
+a. submits current bid provided by bidder and necessary counters are provided with appropriate values
+
+PseudoCode:
+public synchronized boolean submitBid(String bidderName, int listingID, int biddingAmount)
+{
+        if -> itemsUpForBidding.get(item)!= null
+        //Then
+                       If -> itemsPerSeller.get(biddername)< 20
+                      //Then
+                                    If -> highestBidders.get(listingID) != “biddername”
+                                   //Then
+                                             If -> highestBids.get(listingID)< biddingAmount
+                                               //Then
+                                                String c = highestBidders.get(listingID)
+                        
+												if(ItemsPerBuyer.get(bidderName)== null){
+  													ItemsPerBuyer.put(bidderName, 1)
+ 											//Else
+													ItemsPerBuyer.put(bidderName,ItemsPerBuyer.get(bidderName)+1);
+												ItemsPerBuyer.put(c,ItemsPerBuyer.get(c)-1)
+												Highestbids.put(listingID, biddingAmount)
+												Highestbidders.put(listingID, bidderName)
+												Retuen true
+             
+	Return false
+}
+ 
+
+Preconditions:
+1)Item should be available for bidding.
+2)Buyer should not have too many items in its bidding list (items per buyer).
+3)Buyer should not hold the highest bid.
+4)Price bid should be higher than the current/original bid.
+
+Post Conditions:
+1)Increment items per buyer count for the current bidder
+2)Decrement items per buyer count for the former highest bidder.
+3)Add buyer to the list of highest bidders for that item.
+4)Add the bid amount to the list of highest bids for each item.
+5)Return true if the bid is accepted else false if it is rejected.
+
+
+checkBidStatus()
+ 
+invariance:
+provides status if avaialble or of the listing currently from the perspective of bidder. 
+ 
+Pre conditions
+1)Item should be avilable in the list of historical items(itemsAndIds)
+
+Post conditions
+1)Return 1 if the item has passed the bidding duration and the bidder has the highest bid
+2)Return 2 if the item is still accepting bids
+3)Return 3 if the item is not available for bidding and the bidder did not win.
+4)If the bidding is over or expires then remove it from the active list of items
+5)Remove item from the list of highest bids
+6)Remove item from the list of highest bidders
+7)Decrement the count of items per seller which are currently up for bidding
+8)Decrement the count of items per buyer on which they are currently bidding
+9)Increment revenue if the bid is over and successfully won by the buyer
+10)Increment count of sold items if the bid is over and successfully won by the buyer.
+
+Pseudo code:
+
+public synchronized int checkBidStatus(String bidderName, int listingID){
+	
+	if -> listingID not in historical item list
+    	//Then  
+    	return -1
+	//else if -> item present in active bidding list && bidding duration is alive
+		//Then
+        return 2
+    //else if -> duration is passed && bidderName equals highestBidders.get(listingID)
+		//Then
+		highestBidders.remove(listingID);
+		String seller=itemsAndIds.get(listingID).name();
+		int countseller=itemsPerSeller.get(seller);
+		countseller=countseller-1;
+		itemsPerSeller.put(seller,countseller);
+		int count=itemsPerBuyer.get(bidderName);
+		count=count-1;
+		itemsPerBuyer.put(buyer,count);
+		revenue=revenue+highestBid;
+		soldItemsCount=soldItemsCount+1;
+	 	return 1;
+
+    //else if(item not active for bidding && buyer not in highestBidders){
+    	//Then
+		highestBidders.remove(listingID);
+		String seller=itemsAndIds.get(listingID).get(sellerName);
+		int countseller=itemsPerSeller.get(seller);	
+		countseller=countseller-1;
+		itemsPerSeller.put(seller,countseller);
+		int count=itemsPerBuyer.get(bidderName);
+		count=count-1;
+		itemsPerBuyer.put(buyer,count);
+
+Add seller and item in expiredItemPerSeller list or Increment the count of expired Items in the list
+
+                    return 3;
+}
+
+itemUnbid:
+
+Invariant:
+Informs the requester whether there has been a bid on item or not
+
+Pre-conditions:
+Listing id provided should be a valid id
+
+Post-condition: 
+Returns true if there was no bid made on requested listing or item
+Returns false if there was even a single bid on the requested item or listing
+
+Pseudo-Code:
+public synchronized Boolean itemUnbid(int listingID)
+	{
+		// TODO: IMPLEMENT CODE HERE
+		Item i = itemsAndIDs.get(listingID);
+		boolean bidUpon = true;
+		if -> i != null
+		{
+		//Then
+			bidUpon = true;
+			if ->highestBids.containsKey(listingID)
+				//Then
+				bidUpon = false;
+		}
+		return bidUpon;
+	}

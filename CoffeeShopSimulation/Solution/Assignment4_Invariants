@@ -1,0 +1,37 @@
+Invariants, Pre-conditions, Post-conditions:
+
+Customer-
+a. Invariants: Possess properties of customer like list of order, order number, name of customer and waits for available table inside coffee shop
+b. Pre-conditions: Wait till occupied tables count less than available total number of tables
+c. Post-conditions: Entered coffee shop, placed order, received order, eats and leave
+d. Exemptions: InterruptedException in case of interrupt on customer thread
+
+Cook-
+a. Invariants: Delegate cooking of an individual item to machines
+b. Pre-conditions: Wait till the cook is free to process new order 
+c. Post-conditions: Pull customers order based on customer's priority. Process each item from order and delegate the work to specific machine based on food. Wait till there is a signal from machine indicating cooked successfully and indicate 						Customer about their order.
+d. Exemptions: InterruptedException in case of interrupt on Cook thread indicating end of day. Time to leave.
+
+Machine-
+a. Invariants: Cooks food which is to sleep till food cooks and indicate it back to Cook
+b. Pre-conditions: Wait till machine's current food preparation capacity is less than max capacity
+c. Post-conditions: Initiate threads so that items get cooked parallely up to the max capacity of each machine and indicate the Cook about food processed successfully
+d. Exemptions: InterruptedException in case of interrupt on CookAnItem thread
+
+Simulation-
+a. Invariants: Run simulation with parameters passed from arguments or manual input.
+b. Pre-conditions: Availability of parameters such as numTables, numCustomers, numCooks, randomOrder
+c. Post-conditions: Run simulation successfully and validate the execution utilizing Validate class functionality
+d. Exemptions: None
+
+SimulationEvent-
+a. Invariants: Log each and every simulation event to validate after execution.
+b. Pre-conditions: None
+c. Post-conditions: Successfully prints and records each event 
+d. Exemptions: None
+
+CoffeeShopManager-
+a. Invariants: Possess all the resources keeping track of current execution like currently serving customers or orders
+b. Pre-conditions: None
+c. Post-conditions: Provisions solid lock management system for synchronization on several of lists, hashmaps etc.
+d. Exemptions: None

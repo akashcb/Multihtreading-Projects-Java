@@ -1,0 +1,136 @@
+package com.neu.edu;
+
+import java.util.HashMap;
+
+/**
+ * Class provided for ease of test. This will not be used in the project 
+ * evaluation, so feel free to modify it as you like.
+ */ 
+public class Simulation
+{
+    public static void main(String[] args)
+    {                
+        int nrSellers = 50;
+        int nrBidders = 20;
+        System.out.println("Diagnostics before run:");
+        System.out.println("itemsUpForBidding size: "+AuctionServer.getInstance().getItemsUpForBidding().size());
+        System.out.println("lastListingId: "+ AuctionServer.getInstance().getLastListingID());
+        System.out.println("itemsAndIds size: "+AuctionServer.getInstance().getItemsAndIDs().size());
+        System.out.println("highestBids size: "+AuctionServer.getInstance().getHighestBids().size());
+        System.out.println("highestBidders size: "+AuctionServer.getInstance().getHighestBidders().size());
+        System.out.println("itemsPerSellers size: "+AuctionServer.getInstance().getItemsPerSeller().size());
+        System.out.println("itemsPerBuyers size: "+AuctionServer.getInstance().getItemsPerBuyer().size());
+        
+        
+        Thread[] sellerThreads = new Thread[nrSellers];
+        Thread[] bidderThreads = new Thread[nrBidders];
+        Seller[] sellers = new Seller[nrSellers];
+        Bidder[] bidders = new Bidder[nrBidders];
+        
+        // Start the sellers
+        for (int i=0; i<nrSellers; ++i)
+        {
+            sellers[i] = new Seller(
+            		AuctionServer.getInstance(), 
+            		"Seller"+i, 
+            		100, 50, i
+            );
+            sellerThreads[i] = new Thread(sellers[i]);
+            sellerThreads[i].start();
+        }
+        
+        // Start the buyers
+        for (int i=0; i<nrBidders; ++i)
+        {
+            bidders[i] = new Bidder(
+            		AuctionServer.getInstance(), 
+            		"Buyer"+i, 
+            		1000, 20, 150, i
+            );
+            bidderThreads[i] = new Thread(bidders[i]);
+            bidderThreads[i].start();
+        }
+//        
+        // Join on the sellers
+        for (int i=0; i<nrSellers; ++i)
+        {
+            try
+            {
+                sellerThreads[i].join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        // Join on the bidders
+        for (int i=0; i<nrBidders; ++i)
+        {
+            try
+            {
+                bidderThreads[i].join();
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        AuctionServer s = AuctionServer.getInstance();
+        //calculate sum of all the highest bids placed to verify
+        HashMap<Integer, Integer> al = s.getHighestBids();
+        int totalManualBidCount = 0;
+        for(Integer i: al.keySet())
+        {
+        	totalManualBidCount += al.get(i);
+        }
+        
+        //calculate cash spent by bidder
+        int totalCashSpent = 0;
+        for(Bidder b: bidders)
+        {
+        	totalCashSpent += b.cashSpent();
+        }
+        
+        int totalNumberOfSellersHavingItemsPriceMoreThan75  = 0;
+        for(String st: s.getSellersItemPriceMoreThan75().keySet())
+        {
+        	//System.out.println("looking into: "+st +" count: "+s.getSellersItemPriceMoreThan75().get(st));
+        	if(s.getSellersItemPriceMoreThan75().get(st) > 0)
+        		totalNumberOfSellersHavingItemsPriceMoreThan75 += 1;
+        }
+        int sellersItemsNotSoldCount = 0;
+        for(String st : s.getSellersItemNotSold().keySet())
+        {
+        	if(s.getSellersItemNotSold().get(st) > 0)
+        		sellersItemsNotSoldCount += 1;
+        }
+//        int temp = 0;
+//        for(int i: s.getItemsAndIDs().keySet())
+//        {
+//        	if(s.getItemsAndIDs().get(i).lowestBiddingPrice() > 75)
+//        		temp +=1;
+//        	if(s.getHighestBids().containsKey(i))
+//        		temp -= 1;
+//        }
+        // TODO: Add code as needed to debug
+        //System.out.println("Total items on auction: " +s.getItems().size());
+        System.out.println();
+        System.out.println("Diagnostics after run:");
+        System.out.println("itemsUpForBidding size: "+s.getItemsUpForBidding().size());
+        System.out.println("lastListingId: "+ s.getLastListingID());
+        System.out.println("itemsAndIds size: "+s.getItemsAndIDs().size());
+        System.out.println("highestBids size: "+s.getHighestBids().size());
+        System.out.println("highestBidders size: "+s.getHighestBidders().size());
+        System.out.println("itemsPerSellers size: "+s.getItemsPerSeller().size());
+        System.out.println("itemsPerBuyers size: "+s.getItemsPerBuyer().size());
+        System.out.println("Total sold items count: "+s.getSoldItemsCount());
+        System.out.println("Total revenue collected: "+s.getRevenue());
+        System.out.println("Verification summing highest bids: "+totalManualBidCount);
+        System.out.println("Total cash spent by all bidders: "+totalCashSpent);
+        System.out.println("Total number of sellers having items listed with price more than 75: "+totalNumberOfSellersHavingItemsPriceMoreThan75);
+        System.out.println("Total number of sellers having items not sold: "+sellersItemsNotSoldCount);
+        
+    }
+}

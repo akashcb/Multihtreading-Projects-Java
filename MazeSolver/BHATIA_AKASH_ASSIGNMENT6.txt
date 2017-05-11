@@ -1,0 +1,75 @@
+Assignment 6:    -- Akash Bhatia
+
+a. StudentMTMazeSolver.java
+	Invariants:
+	i. 	The maze should not have any cyclic solutions in the graph or existing loops
+	ii. It should be based on a single solution methodology
+
+	Pre-conditions:
+	i.  Maze should have valid entry points
+	ii. There should be valid choices while at entry point
+
+	Post-conditions:
+	i. 	Executor service is shutdown without exceptions
+	ii.	Returns the solution path
+
+	Exception:
+	i.	InterruptedException
+	ii.	ExecutionException
+
+	PseudoCode:
+
+	Class StudentMTMazeSolver extends SkippingMazeSolver
+	{
+		ExecutorService pool;
+		public List<Direction> solve()
+		{
+			// Initialize the tasks and future tasks;
+			//Initialize execution service pool referred above;
+
+			try
+			{
+				//Be prepared with the entry point of the maze;
+				//Iterate through each available option of moving forward at one node all the way till dead end
+				//Each task performs DFS or BFS	
+			}
+			catch(Exception e)
+			{
+
+			}
+			try
+			{
+				//Invoke all the cached tasks
+			}
+			catch(InterruptedException e)
+			{
+
+			}
+
+			//Shutdown pool;
+			//Retreive resultant path from each future task;
+			return results;
+
+		}
+
+		private class DFs implements Callable<List<Direction>>
+		{
+			public List<Direction> call
+			{
+				tryp
+				{
+					Perform DFs;
+
+				}
+				catch(Exception e)
+				{
+
+				}
+
+				return solutionPath;
+				
+			}
+		}
+	}
+
+
